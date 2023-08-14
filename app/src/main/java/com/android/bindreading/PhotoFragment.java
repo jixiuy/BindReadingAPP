@@ -1,5 +1,8 @@
 package com.android.bindreading;
 
+import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,7 +63,22 @@ public class PhotoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_photo, container, false);
+        View view  = inflater.inflate(R.layout.fragment_photo, container, false);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+
+        Resources resources = getResources();
+        Drawable camara = resources.getDrawable(R.drawable.baseline_photo_camera_24);
+        fab.setImageDrawable(camara);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(),PhotoActivity.class);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_from_left,0);
+            }
+        });
+
+        return view;
     }
 }
