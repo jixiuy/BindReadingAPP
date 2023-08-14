@@ -2,16 +2,26 @@ package com.android.bindreading;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.android.bindreading.enentbus.DataEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,10 +70,11 @@ public class PhotoFragment extends Fragment {
         }
     }
 
+    View view = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view  = inflater.inflate(R.layout.fragment_photo, container, false);
+        view  = inflater.inflate(R.layout.fragment_photo, container, false);
         FloatingActionButton fab = view.findViewById(R.id.fab);
 
         Resources resources = getResources();
@@ -75,10 +86,36 @@ public class PhotoFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(),PhotoActivity.class);
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.slide_in_from_left,0);
+                getActivity().overridePendingTransition(R.anim.slide_in_from_left, 0);
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDataEvent(DataEvent event) {
+        // 在这里处理返回的数据
+        String data = event.getData();
+        ImageView imageView = view.findViewById(R.id.image_view);
+        if (!data.isEmpty()) {
+            byte[] decodedBytes = Base64.decode(data, Base64.DEFAULT);
+            Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            imageView.setImageBitmap(decodedBitmap);
+        } else {
+            // 处理Base64图片为空的情况
+        }
     }
 }
