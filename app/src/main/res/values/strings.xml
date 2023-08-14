@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BindReading</string>
+    <string name="menu_search">阅读</string>
+    <string name="menu_settings">拍照</string>
+
+
 </resources>
