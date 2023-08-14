@@ -189,7 +189,6 @@ public class PhotoActivity extends AppCompatActivity {
                     public void run() {
                         overlay.setVisibility(View.GONE); // 隐藏半透明背景
                         progressBar.setVisibility(View.GONE); // 隐藏进度条
-
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     }
                 });
