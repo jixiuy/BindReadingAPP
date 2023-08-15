@@ -6,28 +6,53 @@
     android:layout_height="match_parent"
     tools:context=".PhotoFragment">
 
+
+    <ScrollView
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/notify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="点击右下角按钮进行拍摄"
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                android:autoLink="web"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:background="#B9B8B8"
+                android:gravity="center"
+                android:typeface="serif"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:lineSpacingExtra="4dp"
+                ></TextView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
     <TextView
-        android:id="@+id/notify"
+        android:id="@+id/notify2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="点击右下角按钮进行拍摄"
         android:contentDescription="点击右下角按钮进行拍摄"
-        android:textSize="16sp"
-        android:textIsSelectable="true"
-        android:autoLink="web"
-        android:padding="16dp"
-        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:textColor="#B9B8B8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="#B9B8B8"
-        android:layout_margin="10dp"
-        android:gravity="center"
-        android:typeface="serif"
-        android:lineSpacingExtra="4dp"
         ></TextView>
-
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -44,6 +69,7 @@
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="正在提取文字请等待"
         android:background="#80000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
