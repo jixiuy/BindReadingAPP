@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,6 +72,7 @@ public class ReadFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         tabLayout = view.findViewById(R.id.tab_layout);
         viewPager = view.findViewById(R.id.read_page);
         initData();
@@ -82,19 +84,14 @@ public class ReadFragment extends Fragment {
 
     private void initData() {
         fragmentList = new ArrayList<>();
-        PageFragment tabFragment0 = PageFragment.newInstance("旅游咨讯","");
+        PageFragment tabFragment0 = PageFragment.newInstance("旅游资讯","");
         PageFragment tabFragment1 = PageFragment.newInstance("娱乐新闻","");
         PageFragment tabFragment2 = PageFragment.newInstance("社会新闻","");
         PageFragment tabFragment3 = PageFragment.newInstance("动漫资讯","");
         PageFragment tabFragment4 = PageFragment.newInstance("互联网资讯","");
         PageFragment tabFragment5 = PageFragment.newInstance("健康知识","");
 
-//        TabFragment tabFragment0 = TabFragment.newInstance("旅游咨讯");
-//        TabFragment tabFragment1 = TabFragment.newInstance("娱乐新闻");
-//        TabFragment tabFragment2 = TabFragment.newInstance("社会新闻");
-//        TabFragment tabFragment3 = TabFragment.newInstance("动漫资讯");
-//        TabFragment tabFragment4 = TabFragment.newInstance("互联网资讯");
-//        TabFragment tabFragment5 = TabFragment.newInstance("健康知识");
+
         fragmentList.add(tabFragment0);
         fragmentList.add(tabFragment1);
         fragmentList.add(tabFragment2);

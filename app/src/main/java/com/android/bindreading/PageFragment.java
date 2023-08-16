@@ -5,11 +5,30 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.android.bindreading.adapter.PageAdapter;
+import com.android.bindreading.adapter.PageTwoAdapter;
+import com.android.bindreading.bean.PageBean;
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +46,17 @@ public class PageFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private TextView textView;
+    private RecyclerView recyclerView;
+    private PageBean pageBean;
+
+    private Message message;
+
+    private List<PageBean.ResultDTO.NewslistDTO> list;
+    //感兴趣的关键词
+    private String keyword = "北京";
+    private String url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+
+
     public PageFragment() {
         // Required empty public constructor
     }
@@ -62,15 +91,73 @@ public class PageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_page, container, false);
+        recyclerView = view.findViewById(R.id.recyclerView_article);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_page, container, false);
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        textView = view.findViewById(R.id.textview_title);
-        textView.setText(mParam1);
+
+        message = new Message();
+        if (mParam1.equals("旅游资讯")){
+            url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            message.what = 1;
+        }else if (mParam1.equals("娱乐新闻")){
+            url = "https://apis.tianapi.com/huabian/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            message.what = 2;
+        }else if (mParam1.equals("社会新闻")){
+            url = "https://apis.tianapi.com/social/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            message.what = 2;
+        }else if (mParam1.equals("动漫资讯")){
+            url = "https://apis.tianapi.com/dongman/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            message.what = 1;
+        }else if (mParam1.equals("互联网资讯")){
+            url = "https://apis.tianapi.com/internet/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            message.what = 1;
+        }else if (mParam1.equals("健康知识")){
+            url = "https://apis.tianapi.com/health/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            message.what = 1;
+        }
+
+        Log.d("TAG123q", ""+url+"   "+mParam1+"     1");
+
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String data = response.body().string();
+                Gson gson = new Gson();
+                pageBean = gson.fromJson(data,PageBean.class);
+                handler.sendMessage(message);
+            }
+        });
     }
+
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            if (message.what == 1){
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                PageAdapter pageAdapter = new PageAdapter(pageBean.getResult().getNewslist(), getContext());
+                recyclerView.setAdapter(pageAdapter);
+                Log.d("TAG123q", ""+pageBean.getResult().getNewslist());
+            }else if (message.what == 2){
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                PageTwoAdapter pagetwoAdapter = new PageTwoAdapter(pageBean.getResult().getNewslist(), getContext());
+                recyclerView.setAdapter(pagetwoAdapter);
+            }
+            return false;
+        }
+    });
 }
