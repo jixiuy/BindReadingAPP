@@ -1,17 +1,25 @@
 package com.android.bindreading;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.bindreading.adapter.TablayoutAdapter;
 import com.google.android.material.tabs.TabLayout;
@@ -32,9 +40,11 @@ public class ReadFragment extends Fragment {
 
     private String mParam1;
     private String mParam2;
-
+    private CardView queren;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private EditText sousuo;
+
     private List<Fragment> fragmentList;
     private List<String> titleList;
     private TablayoutAdapter tablayoutAdapter;
@@ -52,6 +62,9 @@ public class ReadFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,10 +88,38 @@ public class ReadFragment extends Fragment {
 
         tabLayout = view.findViewById(R.id.tab_layout);
         viewPager = view.findViewById(R.id.read_page);
+        sousuo = view.findViewById(R.id.sousuo);
+        queren = view.findViewById(R.id.queren);
+
+
         initData();
         tablayoutAdapter = new TablayoutAdapter(getChildFragmentManager(),fragmentList,titleList);
         viewPager.setAdapter(tablayoutAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
+
+
+
+            queren.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (sousuo.getText().toString().equals("")){
+                        Message message = new Message();
+                        message.what = 1;
+                        handler.sendMessage(message);
+                    }else {
+                        Intent intent = new Intent(view.getContext(),SearchActivity.class);
+                        intent.putExtra("keyword",sousuo.getText().toString());
+                        startActivity(intent);
+                    }
+
+
+
+                }
+            });
+
+
 
     }
 
@@ -108,4 +149,14 @@ public class ReadFragment extends Fragment {
         titleList.add("健康知识");
 
     }
+
+    Handler handler= new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            if (message.what == 1){
+                Toast.makeText(getContext(),"搜索框为空",Toast.LENGTH_SHORT).show();
+            }
+            return false;
+        }
+    });
 }

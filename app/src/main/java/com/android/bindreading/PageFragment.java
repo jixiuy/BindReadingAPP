@@ -20,6 +20,12 @@ import com.android.bindreading.adapter.PageAdapter;
 import com.android.bindreading.adapter.PageTwoAdapter;
 import com.android.bindreading.bean.PageBean;
 import com.google.gson.Gson;
+import com.scwang.smart.refresh.footer.ClassicsFooter;
+import com.scwang.smart.refresh.header.ClassicsHeader;
+import com.scwang.smart.refresh.layout.SmartRefreshLayout;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,9 +58,12 @@ public class PageFragment extends Fragment {
     private Message message;
 
     private List<PageBean.ResultDTO.NewslistDTO> list;
+
+    private RefreshLayout refreshLayout;
+
     //感兴趣的关键词
     private String keyword = "北京";
-    private String url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+    private String url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
 
 
     public PageFragment() {
@@ -93,6 +102,7 @@ public class PageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_page, container, false);
         recyclerView = view.findViewById(R.id.recyclerView_article);
+        refreshLayout = view.findViewById(R.id.smartrefresh);
         // Inflate the layout for this fragment
         return view;
     }
@@ -101,25 +111,115 @@ public class PageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        refreshLayout.setRefreshHeader(new ClassicsHeader(view.getContext()));
+        refreshLayout.setRefreshFooter(new ClassicsFooter(view.getContext()));
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                refreshLayout.finishRefresh(1000);
+                message = new Message();
+                if (mParam1.equals("旅游资讯")){
+                    url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }else if (mParam1.equals("娱乐新闻")){
+                    url = "https://apis.tianapi.com/huabian/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 2;
+                }else if (mParam1.equals("社会新闻")){
+                    url = "https://apis.tianapi.com/social/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 2;
+                }else if (mParam1.equals("动漫资讯")){
+                    url = "https://apis.tianapi.com/dongman/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }else if (mParam1.equals("互联网资讯")){
+                    url = "https://apis.tianapi.com/internet/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }else if (mParam1.equals("健康知识")){
+                    url = "https://apis.tianapi.com/health/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }
 
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().url(url).build();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        String data = response.body().string();
+                        Gson gson = new Gson();
+                        pageBean = gson.fromJson(data,PageBean.class);
+                        list = pageBean.getResult().getNewslist();
+                        handler.sendMessage(message);
+                    }
+                });
+
+            }
+        });
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                refreshLayout.finishLoadMore(100);
+                message = new Message();
+                if (mParam1.equals("旅游资讯")){
+                    url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }else if (mParam1.equals("娱乐新闻")){
+                    url = "https://apis.tianapi.com/huabian/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 2;
+                }else if (mParam1.equals("社会新闻")){
+                    url = "https://apis.tianapi.com/social/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 2;
+                }else if (mParam1.equals("动漫资讯")){
+                    url = "https://apis.tianapi.com/dongman/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }else if (mParam1.equals("互联网资讯")){
+                    url = "https://apis.tianapi.com/internet/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }else if (mParam1.equals("健康知识")){
+                    url = "https://apis.tianapi.com/health/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
+                    message.what = 1;
+                }
+
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder().url(url).build();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        String data = response.body().string();
+                        Gson gson = new Gson();
+                        pageBean = gson.fromJson(data,PageBean.class);
+                        list.addAll(pageBean.getResult().getNewslist());
+                        handler.sendMessage(message);
+                    }
+                });
+            }
+        });
         message = new Message();
         if (mParam1.equals("旅游资讯")){
-            url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            url = "https://apis.tianapi.com/travel/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
             message.what = 1;
         }else if (mParam1.equals("娱乐新闻")){
-            url = "https://apis.tianapi.com/huabian/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            url = "https://apis.tianapi.com/huabian/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
             message.what = 2;
         }else if (mParam1.equals("社会新闻")){
-            url = "https://apis.tianapi.com/social/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            url = "https://apis.tianapi.com/social/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
             message.what = 2;
         }else if (mParam1.equals("动漫资讯")){
-            url = "https://apis.tianapi.com/dongman/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            url = "https://apis.tianapi.com/dongman/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
             message.what = 1;
         }else if (mParam1.equals("互联网资讯")){
-            url = "https://apis.tianapi.com/internet/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            url = "https://apis.tianapi.com/internet/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
             message.what = 1;
         }else if (mParam1.equals("健康知识")){
-            url = "https://apis.tianapi.com/health/index?key=a91afee29bb010a296c554e1647ea058&num=50&rand=1";
+            url = "https://apis.tianapi.com/health/index?key=a91afee29bb010a296c554e1647ea058&num=10&rand=1";
             message.what = 1;
         }
 
@@ -139,6 +239,7 @@ public class PageFragment extends Fragment {
                 String data = response.body().string();
                 Gson gson = new Gson();
                 pageBean = gson.fromJson(data,PageBean.class);
+                list = pageBean.getResult().getNewslist();
                 handler.sendMessage(message);
             }
         });
@@ -149,12 +250,12 @@ public class PageFragment extends Fragment {
         public boolean handleMessage(@NonNull Message message) {
             if (message.what == 1){
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                PageAdapter pageAdapter = new PageAdapter(pageBean.getResult().getNewslist(), getContext());
+                PageAdapter pageAdapter = new PageAdapter(list, getContext());
                 recyclerView.setAdapter(pageAdapter);
                 Log.d("TAG123q", ""+pageBean.getResult().getNewslist());
             }else if (message.what == 2){
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                PageTwoAdapter pagetwoAdapter = new PageTwoAdapter(pageBean.getResult().getNewslist(), getContext());
+                PageTwoAdapter pagetwoAdapter = new PageTwoAdapter(list, getContext());
                 recyclerView.setAdapter(pagetwoAdapter);
             }
             return false;
